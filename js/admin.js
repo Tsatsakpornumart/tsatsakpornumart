@@ -239,13 +239,13 @@ class AdminService {
             {
               label: 'Revenue (₵)',
               data: revData.length ? revData : [0],
-              backgroundColor: '#0A39D9',
+              backgroundColor: '#0284C7',
               borderRadius: 6
             },
             {
               label: 'Cost (₵)',
               data: costData.length ? costData : [0],
-              backgroundColor: '#D97706',
+              backgroundColor: '#0F172A',
               borderRadius: 6
             },
             {
@@ -298,7 +298,7 @@ class AdminService {
           labels: spLabels.length ? spLabels : ['No Sales'],
           datasets: [{
             data: spValues.length ? spValues : [1],
-            backgroundColor: ['#0A39D9', '#0284C7', '#059669', '#7C3AED', '#D97706', '#DB2777']
+            backgroundColor: ['#0284C7', '#0F172A', '#38BDF8', '#059669', '#64748B', '#F59E0B']
           }]
         },
         options: {

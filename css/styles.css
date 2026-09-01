@@ -1,41 +1,47 @@
 /* ==============================================================================
    TSATSAKPORNU TRADING ENTERPRISE - POS & RETAIL MANAGEMENT SYSTEM
-   BRAND THEME: ROYAL COBALT BLUE, CRISP WHITE & SLATE METALLIC (LOGO ALIGNED)
+   THEME: ELECTRIC LIGHT BLUE & OBSIDIAN BLACK (SLEEK MODERN AESTHETIC)
    ============================================================================== */
 
 :root {
-  /* Surface & Background (Cool slate matching logo backdrop) */
-  --bg: #F0F4F9;
+  /* Background & Surface (Clean Ice-Blue Tint & Pure White) */
+  --bg: #F0F6FC;
   --surface: #FFFFFF;
-  --surface-alt: #F8FAFC;
-  --surface-hover: #EEF3FA;
+  --surface-alt: #F8FAFD;
+  --surface-hover: #EBF3FC;
   --surface-card: #FFFFFF;
   
-  /* Typography Colors */
-  --ink: #0A1629;
-  --ink-soft: #2D3E53;
-  --muted: #62778F;
-  --line: #D6E0EC;
-  --line-strong: #B4C4D8;
+  /* Typography & Obsidian Black Accents */
+  --ink: #0A0F1D;
+  --ink-soft: #1E293B;
+  --muted: #64748B;
+  --line: #DCE6F2;
+  --line-strong: #B8CCE2;
 
-  /* Brand Colors (Tsatsakpornu Royal Cobalt Blue Logo) */
-  --primary: #0A39D9;
-  --primary-dark: #041B70;
-  --primary-light: #2257FA;
-  --primary-tint: #EFF4FE;
-  --primary-glow: rgba(10, 57, 217, 0.22);
+  /* Brand Colors: Vibrant Light Blue */
+  --primary: #0284C7;
+  --primary-dark: #0369A1;
+  --primary-light: #38BDF8;
+  --primary-tint: #E0F2FE;
+  --primary-glow: rgba(2, 132, 199, 0.22);
 
-  /* Contrast Accent (Warm Amber / Gold) */
-  --accent: #D97706;
-  --accent-dark: #B45309;
+  /* Touch of Black (Dark Obsidian Accents) */
+  --black: #0B0F19;
+  --black-soft: #182235;
+  --black-tint: #0F172A;
+  --black-glow: rgba(11, 15, 25, 0.35);
+
+  /* Contrast Accents (Warm Gold/Amber) */
+  --accent: #F59E0B;
+  --accent-dark: #D97706;
   --accent-tint: #FEF3C7;
 
-  /* Financial Metrics: Net Profit */
+  /* Financial Metrics: Net Profit (Emerald) */
   --profit: #059669;
   --profit-dark: #047857;
   --profit-tint: #ECFDF5;
 
-  /* Financial Metrics: Cost of Goods (COGS) */
+  /* Financial Metrics: Cost of Goods (Obsidian / Amber) */
   --cost: #D97706;
   --cost-tint: #FEF3C7;
 
@@ -52,10 +58,10 @@
   --radius-full: 9999px;
 
   /* Elevation Shadows */
-  --shadow-sm: 0 1px 3px rgba(10, 22, 41, 0.05);
-  --shadow-md: 0 4px 14px rgba(10, 22, 41, 0.08);
-  --shadow-lg: 0 10px 30px rgba(10, 22, 41, 0.12);
-  --shadow-float: 0 20px 45px rgba(10, 22, 41, 0.2);
+  --shadow-sm: 0 1px 3px rgba(11, 15, 25, 0.06);
+  --shadow-md: 0 4px 14px rgba(11, 15, 25, 0.08);
+  --shadow-lg: 0 10px 30px rgba(11, 15, 25, 0.12);
+  --shadow-float: 0 20px 45px rgba(11, 15, 25, 0.22);
 
   --transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -124,16 +130,17 @@ input, select, textarea {
 }
 
 /* ==============================================================================
-   APP HEADER & RESPONSIVE NAVIGATION
+   APP HEADER: OBSIDIAN BLACK WITH ELECTRIC LIGHT BLUE GLOW
    ============================================================================== */
 .app-header {
-  background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+  background: linear-gradient(135deg, #090D16 0%, #0F172A 60%, #0369A1 100%);
   color: #FFFFFF;
   padding: 12px 20px 0;
   position: sticky;
   top: 0;
   z-index: 100;
-  box-shadow: 0 4px 20px rgba(4, 27, 112, 0.28);
+  box-shadow: 0 4px 22px rgba(0, 0, 0, 0.45);
+  border-bottom: 1px solid rgba(56, 189, 248, 0.2);
 }
 
 .header-top {
@@ -155,14 +162,14 @@ input, select, textarea {
   width: 42px;
   height: 42px;
   background: #FFFFFF;
-  border: 2px solid rgba(255, 255, 255, 0.5);
+  border: 2px solid var(--primary-light);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
   flex-shrink: 0;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.4);
 }
 
 .brand-logo-img {
@@ -188,10 +195,10 @@ input, select, textarea {
 
 .brand-info .tagline {
   font-size: 10.5px;
-  color: rgba(255, 255, 255, 0.82);
-  letter-spacing: 0.05em;
+  color: var(--primary-light);
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  font-weight: 600;
+  font-weight: 700;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -209,23 +216,24 @@ input, select, textarea {
   align-items: center;
   gap: 8px;
   padding: 4px 12px 4px 5px;
-  background: rgba(0, 0, 0, 0.22);
+  background: rgba(0, 0, 0, 0.45);
   border-radius: var(--radius-full);
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(56, 189, 248, 0.3);
 }
 
 .user-avatar {
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background: #FFFFFF;
-  color: var(--primary);
+  background: var(--primary);
+  color: #FFFFFF;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 800;
   font-size: 12px;
   flex-shrink: 0;
+  box-shadow: 0 0 8px rgba(56, 189, 248, 0.5);
 }
 
 .user-meta {
@@ -254,12 +262,12 @@ input, select, textarea {
   color: #FDE68A;
 }
 .user-role-tag.role-sales {
-  color: #93C5FD;
+  color: var(--primary-light);
 }
 
 .btn-header-icon {
-  background: rgba(255, 255, 255, 0.14);
-  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   color: #FFFFFF;
   width: 36px;
   height: 36px;
@@ -271,7 +279,9 @@ input, select, textarea {
   flex-shrink: 0;
 }
 .btn-header-icon:hover {
-  background: rgba(255, 255, 255, 0.28);
+  background: rgba(56, 189, 248, 0.2);
+  border-color: var(--primary-light);
+  color: #FFFFFF;
 }
 
 /* Mobile Hamburger Menu Button */
@@ -297,12 +307,14 @@ input, select, textarea {
 }
 .mobile-menu-btn.active .hamburger-icon span:nth-child(1) {
   transform: translateY(6px) rotate(45deg);
+  background: var(--primary-light);
 }
 .mobile-menu-btn.active .hamburger-icon span:nth-child(2) {
   opacity: 0;
 }
 .mobile-menu-btn.active .hamburger-icon span:nth-child(3) {
   transform: translateY(-6px) rotate(-45deg);
+  background: var(--primary-light);
 }
 
 /* Nav Tabs */
@@ -310,7 +322,7 @@ input, select, textarea {
   display: flex;
   gap: 4px;
   overflow-x: auto;
-  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
   -webkit-overflow-scrolling: touch;
 }
 
@@ -319,7 +331,7 @@ input, select, textarea {
   align-items: center;
   gap: 8px;
   padding: 11px 16px;
-  color: rgba(255, 255, 255, 0.76);
+  color: rgba(255, 255, 255, 0.72);
   font-size: 13.5px;
   font-weight: 600;
   border-bottom: 3px solid transparent;
@@ -328,14 +340,15 @@ input, select, textarea {
   flex-shrink: 0;
 }
 .nav-tab-btn:hover {
-  color: #FFFFFF;
-  background: rgba(255, 255, 255, 0.08);
+  color: var(--primary-light);
+  background: rgba(56, 189, 248, 0.08);
 }
 .nav-tab-btn.active {
   color: #FFFFFF;
-  border-bottom-color: #FDE68A;
-  background: rgba(255, 255, 255, 0.14);
+  border-bottom-color: var(--primary-light);
+  background: rgba(56, 189, 248, 0.15);
   font-weight: 700;
+  box-shadow: inset 0 -2px 0 var(--primary-light);
 }
 
 /* ==============================================================================
@@ -400,17 +413,21 @@ input, select, textarea {
   color: #FFFFFF;
 }
 .btn-primary:hover {
-  background: var(--primary-light);
+  background: var(--primary-dark);
   box-shadow: 0 4px 14px var(--primary-glow);
 }
 
 .btn-accent {
-  background: var(--primary);
+  background: var(--black);
   color: #FFFFFF;
+  border: 1px solid rgba(56, 189, 248, 0.4);
   font-weight: 700;
 }
 .btn-accent:hover {
-  background: var(--primary-light);
+  background: #000000;
+  border-color: var(--primary-light);
+  color: var(--primary-light);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
 }
 
 .btn-success {
@@ -428,8 +445,8 @@ input, select, textarea {
 }
 .btn-ghost:hover {
   background: var(--surface-hover);
-  border-color: var(--line-strong);
-  color: var(--ink);
+  border-color: var(--primary);
+  color: var(--primary);
 }
 
 .btn-danger {
@@ -560,13 +577,13 @@ input, select, textarea {
   white-space: nowrap;
 }
 .badge-admin {
-  background: #EFF4FE;
-  color: var(--primary);
-  border: 1px solid #BFDBFE;
+  background: var(--black);
+  color: var(--primary-light);
+  border: 1px solid rgba(56, 189, 248, 0.4);
 }
 .badge-sales {
-  background: #E0F2FE;
-  color: #0369A1;
+  background: var(--primary-tint);
+  color: var(--primary-dark);
   border: 1px solid #BAE6FD;
 }
 .badge-success {
@@ -618,8 +635,8 @@ input, select, textarea {
 }
 
 .auth-logo-wrap {
-  width: 76px;
-  height: 76px;
+  width: 78px;
+  height: 78px;
   background: #FFFFFF;
   border-radius: 50%;
   display: inline-flex;
@@ -627,8 +644,8 @@ input, select, textarea {
   justify-content: center;
   margin-bottom: 12px;
   overflow: hidden;
-  border: 3px solid var(--primary-tint);
-  box-shadow: 0 4px 16px rgba(10, 57, 217, 0.15);
+  border: 3px solid var(--primary-light);
+  box-shadow: 0 4px 18px rgba(2, 132, 199, 0.2);
 }
 
 .auth-logo-img {
@@ -640,7 +657,7 @@ input, select, textarea {
 
 .auth-header h2 {
   font-size: 21px;
-  color: var(--primary-dark);
+  color: var(--ink);
   margin-bottom: 2px;
 }
 .auth-header p {
@@ -681,7 +698,8 @@ input, select, textarea {
 }
 .cat-pill:hover {
   background: var(--surface-hover);
-  border-color: var(--line-strong);
+  border-color: var(--primary);
+  color: var(--primary);
 }
 .cat-pill.active {
   background: var(--primary);
@@ -715,7 +733,7 @@ input, select, textarea {
 .pos-item-card:hover:not(:disabled) {
   border-color: var(--primary);
   transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
+  box-shadow: 0 4px 12px var(--primary-glow);
 }
 .pos-item-card:disabled {
   opacity: 0.5;
@@ -756,6 +774,7 @@ input, select, textarea {
 .cart-panel {
   position: sticky;
   top: 90px;
+  border-top: 3px solid var(--primary);
 }
 
 .cart-items-list {
@@ -878,32 +897,34 @@ input, select, textarea {
 }
 .pay-btn:hover {
   border-color: var(--primary);
+  color: var(--primary);
 }
 .pay-btn.active {
   background: var(--primary-tint);
   border-color: var(--primary);
   color: var(--primary);
   font-weight: 700;
+  box-shadow: 0 0 0 2px var(--primary-glow);
 }
 
-/* Mobile Quick Cart Floating Bar */
+/* Mobile Quick Cart Floating Bar: Black with Electric Light Blue */
 .mobile-cart-bar {
   display: none;
   position: fixed;
   bottom: 16px;
   left: 16px;
   right: 16px;
-  background: var(--primary-dark);
+  background: var(--black);
   color: #FFFFFF;
   padding: 12px 18px;
   border-radius: var(--radius-full);
-  box-shadow: 0 8px 24px rgba(4, 27, 112, 0.4);
+  box-shadow: 0 8px 24px var(--black-glow);
   z-index: 90;
   align-items: center;
   justify-content: space-between;
   cursor: pointer;
   animation: slideUp 0.25s ease-out;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(56, 189, 248, 0.4);
 }
 
 .mobile-cart-summary {
@@ -912,6 +933,7 @@ input, select, textarea {
   gap: 8px;
   font-weight: 700;
   font-size: 13.5px;
+  color: #FFFFFF;
 }
 
 .mobile-cart-icon {
@@ -924,10 +946,11 @@ input, select, textarea {
   gap: 6px;
   font-weight: 800;
   font-size: 12.5px;
-  color: #FDE68A;
-  background: rgba(253, 230, 138, 0.18);
+  color: #FFFFFF;
+  background: var(--primary);
   padding: 5px 12px;
   border-radius: var(--radius-full);
+  box-shadow: 0 0 8px var(--primary-glow);
 }
 
 /* ==============================================================================
@@ -962,7 +985,7 @@ input, select, textarea {
 }
 .metric-card.profit::after { background: var(--profit); }
 .metric-card.revenue::after { background: var(--primary); }
-.metric-card.cost::after { background: var(--cost); }
+.metric-card.cost::after { background: var(--black); }
 .metric-card.orders::after { background: var(--info); }
 
 .metric-header {
@@ -989,7 +1012,7 @@ input, select, textarea {
 }
 .metric-card.profit .metric-icon { background: var(--profit-tint); color: var(--profit); }
 .metric-card.revenue .metric-icon { background: var(--primary-tint); color: var(--primary); }
-.metric-card.cost .metric-icon { background: var(--cost-tint); color: var(--cost); }
+.metric-card.cost .metric-icon { background: #F1F5F9; color: var(--black); }
 .metric-card.orders .metric-icon { background: var(--info-tint); color: var(--info); }
 
 .metric-value {
@@ -1005,6 +1028,9 @@ input, select, textarea {
 }
 .metric-card.revenue .metric-value {
   color: var(--primary);
+}
+.metric-card.cost .metric-value {
+  color: var(--black);
 }
 
 .metric-footer {
@@ -1095,8 +1121,8 @@ input, select, textarea {
   color: var(--ink-soft);
 }
 .rank-badge.top-1 { background: #FEF3C7; color: #B45309; border-color: #FDE68A; }
-.rank-badge.top-2 { background: #EFF4FE; color: var(--primary); border-color: #BFDBFE; }
-.rank-badge.top-3 { background: #FCE7F3; color: #9D174D; border-color: #FBCFE8; }
+.rank-badge.top-2 { background: var(--primary-tint); color: var(--primary); border-color: #BAE6FD; }
+.rank-badge.top-3 { background: #F1F5F9; color: var(--black); border-color: #CBD5E1; }
 
 .salesperson-cell {
   display: flex;
@@ -1143,7 +1169,7 @@ input, select, textarea {
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(4, 27, 112, 0.65);
+  background: rgba(11, 15, 25, 0.7);
   backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
@@ -1170,6 +1196,7 @@ input, select, textarea {
   box-shadow: var(--shadow-float);
   transform: scale(0.96);
   transition: var(--transition);
+  border-top: 3px solid var(--primary);
 }
 .modal-overlay.show .modal-content {
   transform: scale(1);
@@ -1280,7 +1307,7 @@ input, select, textarea {
 }
 
 .toast {
-  background: var(--ink);
+  background: var(--black);
   color: #FFFFFF;
   padding: 11px 16px;
   border-radius: var(--radius-md);
@@ -1293,14 +1320,15 @@ input, select, textarea {
   display: flex;
   align-items: center;
   gap: 8px;
+  border: 1px solid rgba(56, 189, 248, 0.3);
 }
 .toast.show {
   opacity: 1;
   transform: translateY(0);
 }
-.toast.success { background: var(--primary-dark); border-left: 4px solid var(--profit); }
+.toast.success { background: #064E3B; border-left: 4px solid var(--profit); }
 .toast.error { background: #7F1D1D; border-left: 4px solid var(--danger); }
-.toast.info { background: #1E293B; border-left: 4px solid var(--info); }
+.toast.info { background: var(--black); border-left: 4px solid var(--primary-light); }
 
 /* Empty state */
 .empty-state {
@@ -1380,9 +1408,9 @@ input, select, textarea {
     top: 100%;
     left: 0;
     right: 0;
-    background: linear-gradient(180deg, var(--primary-dark) 0%, #031454 100%);
-    box-shadow: 0 12px 30px rgba(4, 27, 112, 0.45);
-    border-top: 1px solid rgba(255, 255, 255, 0.15);
+    background: linear-gradient(180deg, #090D16 0%, #031428 100%);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+    border-top: 1px solid rgba(56, 189, 248, 0.25);
     z-index: 1000;
     max-height: 80vh;
     overflow-y: auto;
@@ -1405,13 +1433,14 @@ input, select, textarea {
   }
 
   .nav-tab-btn:hover, .nav-tab-btn:active {
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(56, 189, 248, 0.1);
+    color: var(--primary-light);
   }
 
   .nav-tab-btn.active {
     border-bottom: none;
-    border-left-color: #FDE68A;
-    background: rgba(255, 255, 255, 0.14);
+    border-left-color: var(--primary-light);
+    background: rgba(56, 189, 248, 0.16);
     color: #FFFFFF;
   }
 
