@@ -1,15 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TSATSAKPORNU · Retail Management & Net Profit System</title>
-  <meta name="description" content="Production-grade retail Point of Sale (POS) and inventory management system with Supabase backend, dual-role authentication, Net Profit tracking, and salesperson performance analytics.">
+  <meta name="description"
+    content="Production-grade retail Point of Sale (POS) and inventory management system with Supabase backend, dual-role authentication, Net Profit tracking, and salesperson performance analytics.">
 
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700;800&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700;800&display=swap"
+    rel="stylesheet">
 
   <!-- Styles -->
   <link rel="stylesheet" href="css/styles.css">
@@ -19,6 +23,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
+
 <body>
 
   <!-- ================= AUTHENTICATION VIEW ================= -->
@@ -57,7 +62,8 @@
         </button>
 
         <!-- Mobile Hamburger Menu -->
-        <button class="btn-header-icon mobile-menu-btn" id="mobileMenuBtn" title="Toggle Menu" onclick="window.app.toggleMobileNav()">
+        <button class="btn-header-icon mobile-menu-btn" id="mobileMenuBtn" title="Toggle Menu"
+          onclick="window.app.toggleMobileNav()">
           <span class="hamburger-icon">
             <span></span>
             <span></span>
@@ -75,13 +81,16 @@
       <button class="nav-tab-btn" data-view="my-shift" onclick="window.app.navigate('my-shift')">
         📋 My Shift Sales
       </button>
-      <button class="nav-tab-btn admin-only-tab" data-view="admin-overview" onclick="window.app.navigate('admin-overview')">
+      <button class="nav-tab-btn admin-only-tab" data-view="admin-overview"
+        onclick="window.app.navigate('admin-overview')">
         📊 Net Profit & KPIs
       </button>
-      <button class="nav-tab-btn admin-only-tab" data-view="admin-performance" onclick="window.app.navigate('admin-performance')">
+      <button class="nav-tab-btn admin-only-tab" data-view="admin-performance"
+        onclick="window.app.navigate('admin-performance')">
         👥 Salesperson Performance
       </button>
-      <button class="nav-tab-btn admin-only-tab" data-view="admin-inventory" onclick="window.app.navigate('admin-inventory')">
+      <button class="nav-tab-btn admin-only-tab" data-view="admin-inventory"
+        onclick="window.app.navigate('admin-inventory')">
         📦 Inventory & Prices
       </button>
       <button class="nav-tab-btn admin-only-tab" data-view="admin-audit" onclick="window.app.navigate('admin-audit')">
@@ -101,7 +110,8 @@
           <div class="card" style="padding: 16px; margin-bottom: 14px;">
             <div class="search-bar" style="margin-bottom: 12px;">
               <span>🔍</span>
-              <input type="text" id="posSearchInput" placeholder="Search item by name or SKU..." oninput="window.posService.setSearchQuery(this.value)">
+              <input type="text" id="posSearchInput" placeholder="Search item by name or SKU..."
+                oninput="window.posService.setSearchQuery(this.value)">
             </div>
             <!-- Category Filter Pills -->
             <div class="category-pills" id="posCategoryPills"></div>
@@ -125,24 +135,34 @@
             <div class="cart-items-list" id="posCartList"></div>
 
             <!-- Customer Details (Optional) -->
-            <div style="background: var(--surface-alt); padding: 10px 12px; border-radius: var(--radius-md); border: 1px solid var(--line); margin-bottom: 14px;">
-              <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--muted); margin-bottom: 6px;">Customer Info (Optional)</div>
+            <div
+              style="background: var(--surface-alt); padding: 10px 12px; border-radius: var(--radius-md); border: 1px solid var(--line); margin-bottom: 14px;">
+              <div
+                style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--muted); margin-bottom: 6px;">
+                Customer Info (Optional)</div>
               <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-                <input type="text" id="posCustomerName" placeholder="Customer name" style="font-size:12.5px; padding:6px 8px; border-radius:6px; border:1px solid var(--line);">
-                <input type="text" id="posCustomerPhone" placeholder="Phone (MoMo)" style="font-size:12.5px; padding:6px 8px; border-radius:6px; border:1px solid var(--line);">
+                <input type="text" id="posCustomerName" placeholder="Customer name"
+                  style="font-size:12.5px; padding:6px 8px; border-radius:6px; border:1px solid var(--line);">
+                <input type="text" id="posCustomerPhone" placeholder="Phone (MoMo)"
+                  style="font-size:12.5px; padding:6px 8px; border-radius:6px; border:1px solid var(--line);">
               </div>
             </div>
 
             <!-- Payment Method Picker -->
-            <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--muted); margin-bottom: 6px;">Payment Method</div>
+            <div
+              style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--muted); margin-bottom: 6px;">
+              Payment Method</div>
             <div class="payment-methods">
-              <button type="button" class="pay-btn active" data-method="cash" onclick="window.posService.setPaymentMethod('cash')">
+              <button type="button" class="pay-btn active" data-method="cash"
+                onclick="window.posService.setPaymentMethod('cash')">
                 <span>💵</span> Cash
               </button>
-              <button type="button" class="pay-btn" data-method="momo" onclick="window.posService.setPaymentMethod('momo')">
+              <button type="button" class="pay-btn" data-method="momo"
+                onclick="window.posService.setPaymentMethod('momo')">
                 <span>📱</span> MoMo
               </button>
-              <button type="button" class="pay-btn" data-method="card" onclick="window.posService.setPaymentMethod('card')">
+              <button type="button" class="pay-btn" data-method="card"
+                onclick="window.posService.setPaymentMethod('card')">
                 <span>💳</span> POS Card
               </button>
             </div>
@@ -188,8 +208,10 @@
             <div class="card-subtitle">Orders processed by your current session</div>
           </div>
           <div style="text-align:right;">
-            <div style="font-size:11px; font-weight:700; color:var(--muted); text-transform:uppercase;">Shift Total</div>
-            <div class="mono" id="myShiftTotalRevenue" style="font-size:22px; font-weight:800; color:var(--primary);">₵0.00</div>
+            <div style="font-size:11px; font-weight:700; color:var(--muted); text-transform:uppercase;">Shift Total
+            </div>
+            <div class="mono" id="myShiftTotalRevenue" style="font-size:22px; font-weight:800; color:var(--primary);">
+              ₵0.00</div>
           </div>
         </div>
 
@@ -200,17 +222,23 @@
     <!-- 3. ADMIN OVERVIEW & NET PROFIT DASHBOARD -->
     <section id="view-admin-overview" class="view-panel">
       <!-- Period Selector -->
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
+      <div
+        style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
         <div>
           <h2 style="font-size:22px;">Admin Financial Overview</h2>
           <div style="font-size:13px; color:var(--muted);">Real-time Revenue, Cost of Goods Sold, and Net Profit</div>
         </div>
 
-        <div style="display:flex; gap:6px; background:var(--surface); padding:4px; border-radius:var(--radius-md); border:1px solid var(--line);">
-          <button class="btn btn-ghost btn-sm period-btn" data-period="today" onclick="window.adminService.setPeriod('today')">Today</button>
-          <button class="btn btn-ghost btn-sm period-btn" data-period="week" onclick="window.adminService.setPeriod('week')">Last 7 Days</button>
-          <button class="btn btn-ghost btn-sm period-btn" data-period="month" onclick="window.adminService.setPeriod('month')">30 Days</button>
-          <button class="btn btn-ghost btn-sm period-btn active" data-period="all" onclick="window.adminService.setPeriod('all')">All Time</button>
+        <div
+          style="display:flex; gap:6px; background:var(--surface); padding:4px; border-radius:var(--radius-md); border:1px solid var(--line);">
+          <button class="btn btn-ghost btn-sm period-btn" data-period="today"
+            onclick="window.adminService.setPeriod('today')">Today</button>
+          <button class="btn btn-ghost btn-sm period-btn" data-period="week"
+            onclick="window.adminService.setPeriod('week')">Last 7 Days</button>
+          <button class="btn btn-ghost btn-sm period-btn" data-period="month"
+            onclick="window.adminService.setPeriod('month')">30 Days</button>
+          <button class="btn btn-ghost btn-sm period-btn active" data-period="all"
+            onclick="window.adminService.setPeriod('all')">All Time</button>
         </div>
       </div>
 
@@ -294,7 +322,8 @@
         <div class="card-header">
           <div>
             <div class="card-title">👥 Salesperson Performance & Profit Contribution</div>
-            <div class="card-subtitle">Track how each cashier is performing, total sales volume, and net profit generated for the business</div>
+            <div class="card-subtitle">Track how each cashier is performing, total sales volume, and net profit
+              generated for the business</div>
           </div>
         </div>
 
@@ -311,7 +340,8 @@
             <div class="card-subtitle">Manage item cost prices, customer selling prices, margins, and stock levels</div>
           </div>
           <div style="display:flex; gap:8px; align-items:center;">
-            <button class="btn btn-danger btn-sm" onclick="window.adminService.resetAllData()" title="Wipe all products, sales, and KPI data to start fresh">
+            <button class="btn btn-danger btn-sm" onclick="window.adminService.resetAllData()"
+              title="Wipe all products, sales, and KPI data to start fresh">
               🔄 Reset All Data
             </button>
             <button class="btn btn-primary" onclick="window.adminService.openProductModal()">
@@ -322,7 +352,8 @@
 
         <div class="search-bar" style="margin-bottom: 16px;">
           <span>🔍</span>
-          <input type="text" placeholder="Search inventory by product name or SKU..." oninput="window.adminService.setInventorySearch(this.value)">
+          <input type="text" placeholder="Search inventory by product name or SKU..."
+            oninput="window.adminService.setInventorySearch(this.value)">
         </div>
 
         <div id="adminInventoryTable"></div>
@@ -341,7 +372,8 @@
 
         <div class="search-bar" style="margin-bottom: 16px;">
           <span>🔍</span>
-          <input type="text" placeholder="Filter by salesperson, customer, payment method, or receipt ID..." oninput="window.adminService.setSalesAuditSearch(this.value)">
+          <input type="text" placeholder="Filter by salesperson, customer, payment method, or receipt ID..."
+            oninput="window.adminService.setSalesAuditSearch(this.value)">
         </div>
 
         <div id="adminSalesAuditTable"></div>
@@ -371,4 +403,5 @@
   <script src="js/admin.js"></script>
   <script src="js/app.js"></script>
 </body>
+
 </html>
