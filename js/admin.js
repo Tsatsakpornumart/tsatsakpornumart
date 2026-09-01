@@ -239,7 +239,7 @@ class AdminService {
             {
               label: 'Revenue (₵)',
               data: revData.length ? revData : [0],
-              backgroundColor: '#0E5A3B',
+              backgroundColor: '#0A39D9',
               borderRadius: 6
             },
             {
@@ -269,7 +269,7 @@ class AdminService {
           },
           scales: {
             x: { grid: { display: false } },
-            y: { grid: { color: '#EAEAEA' } }
+            y: { grid: { color: '#E2E8F0' } }
           }
         }
       });
@@ -298,7 +298,7 @@ class AdminService {
           labels: spLabels.length ? spLabels : ['No Sales'],
           datasets: [{
             data: spValues.length ? spValues : [1],
-            backgroundColor: ['#0E5A3B', '#D97706', '#2563EB', '#7C3AED', '#EC4899', '#10B981']
+            backgroundColor: ['#0A39D9', '#0284C7', '#059669', '#7C3AED', '#D97706', '#DB2777']
           }]
         },
         options: {
