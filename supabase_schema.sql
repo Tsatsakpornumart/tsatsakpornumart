@@ -73,25 +73,36 @@ alter table public.sale_items enable row level security;
 
 -- 7. RLS Policies
 -- Profiles: Any authenticated user can read profiles; users can update their own
+drop policy if exists "Allow read profiles" on public.profiles;
 create policy "Allow read profiles" on public.profiles for select using (true);
+drop policy if exists "Allow self insert/update profiles" on public.profiles;
 create policy "Allow self insert/update profiles" on public.profiles for all using (auth.uid() = id);
 
 -- Products: Everyone can read products; only admins can insert/update/delete
+drop policy if exists "Allow read active products" on public.products;
 create policy "Allow read active products" on public.products for select using (true);
+drop policy if exists "Allow admin modify products" on public.products;
 create policy "Allow admin modify products" on public.products for all using (
   exists (select 1 from public.profiles where id = auth.uid() and role = 'admin')
   or auth.role() = 'anon'
 );
 
 -- Sales & Sale Items: All users can insert; Everyone can read (frontend restricts sensitive calculations to admins)
+drop policy if exists "Allow insert sales" on public.sales;
 create policy "Allow insert sales" on public.sales for insert with check (true);
+drop policy if exists "Allow read sales" on public.sales;
 create policy "Allow read sales" on public.sales for select using (true);
+drop policy if exists "Allow delete sales" on public.sales;
 create policy "Allow delete sales" on public.sales for delete using (true);
+drop policy if exists "Allow insert sale_items" on public.sale_items;
 create policy "Allow insert sale_items" on public.sale_items for insert with check (true);
+drop policy if exists "Allow read sale_items" on public.sale_items;
 create policy "Allow read sale_items" on public.sale_items for select using (true);
+drop policy if exists "Allow delete sale_items" on public.sale_items;
 create policy "Allow delete sale_items" on public.sale_items for delete using (true);
 
 -- Products: Allow admin to delete products for reset
+drop policy if exists "Allow delete products" on public.products;
 create policy "Allow delete products" on public.products for delete using (true);
 
 -- 8. Trigger to automatically create a profile when a new user signs up via Supabase Auth
@@ -114,10 +125,25 @@ create trigger on_auth_user_created
   after insert on auth.users
   for each row execute procedure public.handle_new_user();
 
--- 9. No seed products — add your real products via the Admin Panel
+-- 9. Enable realtime updates for products and sales
+do $$
+begin
+  alter publication supabase_realtime add table public.products;
+exception
+  when duplicate_object then null;
+end $$;
+
+do $$
+begin
+  alter publication supabase_realtime add table public.sales;
+exception
+  when duplicate_object then null;
+end $$;
+
+-- 10. No seed products — add your real products via the Admin Panel
 -- (Removed sample data to ensure clean KPI tracking from day one)
 
--- 10. Create Supabase Storage Bucket for Product Images
+-- 11. Create Supabase Storage Bucket for Product Images
 insert into storage.buckets (id, name, public)
 values ('product-images', 'product-images', true)
 on conflict (id) do update set public = true;

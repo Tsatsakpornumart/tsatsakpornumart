@@ -15,6 +15,20 @@ const STORAGE_KEYS = {
 const DEFAULT_PRODUCTS = [];
 const DEFAULT_SALES = [];
 
+function createUuid() {
+  if (window.crypto?.randomUUID) return window.crypto.randomUUID();
+  const bytes = new Uint8Array(16);
+  window.crypto.getRandomValues(bytes);
+  bytes[6] = (bytes[6] & 0x0f) | 0x40;
+  bytes[8] = (bytes[8] & 0x3f) | 0x80;
+  const hex = Array.from(bytes, byte => byte.toString(16).padStart(2, '0')).join('');
+  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+}
+
+function isUuid(value) {
+  return typeof value === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
+}
+
 class SupabaseDataService {
   constructor() {
     this.client = null;
@@ -88,6 +102,7 @@ class SupabaseDataService {
         if (!error) {
           this.isConnected = true;
           console.log('✅ Connected to Supabase backend successfully.');
+          await this.migrateLegacyLocalData();
           this.setupRealtimeSubscriptions();
           return { success: true, mode: 'cloud' };
         } else {
@@ -104,6 +119,75 @@ class SupabaseDataService {
 
     this.isConnected = false;
     return { success: true, mode: 'local' };
+  }
+
+  async migrateLegacyLocalData() {
+    if (!this.client) return;
+
+    const productIdMap = new Map();
+    const legacyProducts = this.localDB.products.filter(product => !isUuid(product.id));
+
+    for (const product of legacyProducts) {
+      const oldId = product.id;
+      const newId = createUuid();
+      const { error } = await this.client.from('products').upsert({ ...product, id: newId });
+      if (error) {
+        console.error('Could not migrate local product:', error.message);
+      } else {
+        product.id = newId;
+        productIdMap.set(oldId, newId);
+      }
+    }
+
+    if (productIdMap.size > 0) {
+      for (const sale of this.localDB.sales) {
+        for (const item of sale.items || []) {
+          if (productIdMap.has(item.product_id)) item.product_id = productIdMap.get(item.product_id);
+        }
+      }
+      this.saveLocalDB();
+    }
+
+    for (const sale of this.localDB.sales.filter(item => !isUuid(item.id))) {
+      const saleId = createUuid();
+      const { error: saleError } = await this.client.from('sales').insert({
+        id: saleId,
+        salesperson_id: isUuid(sale.salesperson_id) ? sale.salesperson_id : null,
+        salesperson_name: sale.salesperson_name,
+        customer_name: sale.customer_name,
+        customer_phone: sale.customer_phone,
+        total_revenue: sale.total_revenue,
+        total_cost: sale.total_cost,
+        net_profit: sale.net_profit,
+        payment_method: sale.payment_method,
+        notes: sale.notes,
+        created_at: sale.created_at
+      });
+
+      if (saleError) {
+        console.error('Could not migrate local sale:', saleError.message);
+        continue;
+      }
+
+      sale.id = saleId;
+
+      if (sale.items?.length) {
+        const { error: itemError } = await this.client.from('sale_items').insert(sale.items.map(item => ({
+          sale_id: saleId,
+          product_id: isUuid(item.product_id) ? item.product_id : null,
+          product_name: item.product_name,
+          quantity: item.quantity,
+          cost_price: item.cost_price,
+          selling_price: item.selling_price,
+          subtotal_revenue: item.subtotal_revenue,
+          subtotal_cost: item.subtotal_cost,
+          subtotal_profit: item.subtotal_profit
+        })));
+        if (itemError) console.error('Could not migrate local sale items:', itemError.message);
+      }
+    }
+
+    this.saveLocalDB();
   }
 
   setupRealtimeSubscriptions() {
@@ -169,9 +253,7 @@ class SupabaseDataService {
   }
 
   async saveProduct(product) {
-    if (!product.id) {
-      product.id = 'p-' + Date.now().toString(36);
-    }
+    if (!isUuid(product.id)) product.id = createUuid();
     product.cost_price = Number(product.cost_price) || 0;
     product.selling_price = Number(product.selling_price) || 0;
     product.stock = parseInt(product.stock) || 0;
@@ -339,7 +421,7 @@ class SupabaseDataService {
 
   async recordSale(saleData) {
     // Computations
-    const id = 'sale-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+    const id = createUuid();
     const sale = {
       id,
       salesperson_id: saleData.salesperson_id || 'sales-default',
@@ -383,6 +465,7 @@ class SupabaseDataService {
         if (!saleErr && insertedSale && sale.items.length > 0) {
           const itemsPayload = sale.items.map(it => ({
             sale_id: insertedSale.id,
+            product_id: isUuid(it.product_id) ? it.product_id : null,
             product_name: it.product_name,
             quantity: it.quantity,
             cost_price: it.cost_price,
