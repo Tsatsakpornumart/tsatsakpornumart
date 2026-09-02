@@ -102,8 +102,6 @@ class SupabaseDataService {
         if (!error) {
           this.isConnected = true;
           console.log('✅ Connected to Supabase backend successfully.');
-          await this.migrateLegacyLocalData();
-          this.setupRealtimeSubscriptions();
           return { success: true, mode: 'cloud' };
         } else {
           console.warn('Supabase query failed, using local mode:', error.message);
@@ -121,115 +119,27 @@ class SupabaseDataService {
     return { success: true, mode: 'local' };
   }
 
-  async migrateLegacyLocalData() {
-    if (!this.client) return;
-
-    const productIdMap = new Map();
-    const legacyProducts = this.localDB.products.filter(product => !isUuid(product.id));
-
-    for (const product of legacyProducts) {
-      const oldId = product.id;
-      const newId = createUuid();
-      const { error } = await this.client.from('products').upsert({ ...product, id: newId });
-      if (error) {
-        console.error('Could not migrate local product:', error.message);
-      } else {
-        product.id = newId;
-        productIdMap.set(oldId, newId);
-      }
-    }
-
-    if (productIdMap.size > 0) {
-      for (const sale of this.localDB.sales) {
-        for (const item of sale.items || []) {
-          if (productIdMap.has(item.product_id)) item.product_id = productIdMap.get(item.product_id);
-        }
-      }
-      this.saveLocalDB();
-    }
-
-    for (const sale of this.localDB.sales.filter(item => !isUuid(item.id))) {
-      const saleId = createUuid();
-      const { error: saleError } = await this.client.from('sales').insert({
-        id: saleId,
-        salesperson_id: isUuid(sale.salesperson_id) ? sale.salesperson_id : null,
-        salesperson_name: sale.salesperson_name,
-        customer_name: sale.customer_name,
-        customer_phone: sale.customer_phone,
-        total_revenue: sale.total_revenue,
-        total_cost: sale.total_cost,
-        net_profit: sale.net_profit,
-        payment_method: sale.payment_method,
-        notes: sale.notes,
-        created_at: sale.created_at
-      });
-
-      if (saleError) {
-        console.error('Could not migrate local sale:', saleError.message);
-        continue;
-      }
-
-      sale.id = saleId;
-
-      if (sale.items?.length) {
-        const { error: itemError } = await this.client.from('sale_items').insert(sale.items.map(item => ({
-          sale_id: saleId,
-          product_id: isUuid(item.product_id) ? item.product_id : null,
-          product_name: item.product_name,
-          quantity: item.quantity,
-          cost_price: item.cost_price,
-          selling_price: item.selling_price,
-          subtotal_revenue: item.subtotal_revenue,
-          subtotal_cost: item.subtotal_cost,
-          subtotal_profit: item.subtotal_profit
-        })));
-        if (itemError) console.error('Could not migrate local sale items:', itemError.message);
-      }
-    }
-
-    this.saveLocalDB();
-  }
-
-  setupRealtimeSubscriptions() {
-    if (!this.client || !this.isConnected) return;
-    if (this.realtimeChannel) {
-      try {
-        this.client.removeChannel(this.realtimeChannel);
-      } catch (e) {}
-    }
-
-    try {
-      this.realtimeChannel = this.client.channel('tsatsakpornu_realtime_changes')
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'products' }, (payload) => {
-          console.log('⚡ Realtime Product update received from cloud:', payload);
-          this.notifyChange('products', payload);
-        })
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'sales' }, (payload) => {
-          console.log('⚡ Realtime Sales update received from cloud:', payload);
-          this.notifyChange('sales', payload);
-        })
-        .subscribe((status) => {
-          console.log('⚡ Supabase Realtime subscription status:', status);
-        });
-    } catch (e) {
-      console.warn('Could not setup realtime subscriptions:', e);
+  async setCredentials(url, key) {
+    url = (url || '').trim();
+    key = (key || '').trim();
+    if (url && key) {
+      localStorage.setItem(STORAGE_KEYS.SUPABASE_URL, url);
+      localStorage.setItem(STORAGE_KEYS.SUPABASE_KEY, key);
+      return await this.initClient();
+    } else {
+      localStorage.removeItem(STORAGE_KEYS.SUPABASE_URL);
+      localStorage.removeItem(STORAGE_KEYS.SUPABASE_KEY);
+      this.client = null;
+      this.isConnected = false;
+      return { success: true, mode: 'local' };
     }
   }
 
-  onDataChange(callback) {
-    if (typeof callback === 'function') {
-      this.changeListeners.push(callback);
-    }
-  }
-
-  notifyChange(entity, payload) {
-    for (const listener of this.changeListeners) {
-      try {
-        listener(entity, payload);
-      } catch (e) {
-        console.error('Data change listener error:', e);
-      }
-    }
+  getCredentials() {
+    return {
+      url: localStorage.getItem(STORAGE_KEYS.SUPABASE_URL) || '',
+      key: localStorage.getItem(STORAGE_KEYS.SUPABASE_KEY) || ''
+    };
   }
 
   /* ================= PRODUCTS CRUD ================= */
