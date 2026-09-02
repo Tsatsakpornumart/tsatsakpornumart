@@ -119,29 +119,6 @@ class SupabaseDataService {
     return { success: true, mode: 'local' };
   }
 
-  async setCredentials(url, key) {
-    url = (url || '').trim();
-    key = (key || '').trim();
-    if (url && key) {
-      localStorage.setItem(STORAGE_KEYS.SUPABASE_URL, url);
-      localStorage.setItem(STORAGE_KEYS.SUPABASE_KEY, key);
-      return await this.initClient();
-    } else {
-      localStorage.removeItem(STORAGE_KEYS.SUPABASE_URL);
-      localStorage.removeItem(STORAGE_KEYS.SUPABASE_KEY);
-      this.client = null;
-      this.isConnected = false;
-      return { success: true, mode: 'local' };
-    }
-  }
-
-  getCredentials() {
-    return {
-      url: localStorage.getItem(STORAGE_KEYS.SUPABASE_URL) || '',
-      key: localStorage.getItem(STORAGE_KEYS.SUPABASE_KEY) || ''
-    };
-  }
-
   /* ================= PRODUCTS CRUD ================= */
   async getProducts() {
     if (this.isConnected && this.client) {
