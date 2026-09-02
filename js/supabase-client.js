@@ -1,6 +1,7 @@
 /**
  * TSATSAKPORNU POS - SUPABASE CLIENT & DATA ADAPTER
- * Provides direct Supabase Cloud backend integration with seamless offline/local demo fallback.
+ * Provides direct Supabase Cloud backend integration with seamless offline/local demo fallback
+ * and cross-device real-time synchronization.
  */
 
 const STORAGE_KEYS = {
@@ -10,16 +11,16 @@ const STORAGE_KEYS = {
   AUTH_SESSION: 'ntoso_pos_session'
 };
 
-// Empty defaults — add your real products via the Admin panel
+// Empty defaults — real data synced with Supabase Cloud
 const DEFAULT_PRODUCTS = [];
-
-// Empty defaults — real sales will be recorded from the POS terminal
 const DEFAULT_SALES = [];
 
 class SupabaseDataService {
   constructor() {
     this.client = null;
     this.isConnected = false;
+    this.realtimeChannel = null;
+    this.changeListeners = [];
     this.localDB = this.loadLocalDB();
   }
 
@@ -49,9 +50,35 @@ class SupabaseDataService {
     localStorage.setItem(STORAGE_KEYS.LOCAL_DB, JSON.stringify(this.localDB));
   }
 
+  getCredentials() {
+    const localUrl = localStorage.getItem(STORAGE_KEYS.SUPABASE_URL);
+    const localKey = localStorage.getItem(STORAGE_KEYS.SUPABASE_KEY);
+    const defaultConfig = window.DEFAULT_SUPABASE_CONFIG || {};
+
+    const url = (localUrl || defaultConfig.url || '').trim();
+    const key = (localKey || defaultConfig.key || '').trim();
+    const isDefault = !localUrl && !!defaultConfig.url;
+
+    return { url, key, isDefault };
+  }
+
+  async setCredentials(url, key) {
+    url = (url || '').trim();
+    key = (key || '').trim();
+    if (url && key) {
+      localStorage.setItem(STORAGE_KEYS.SUPABASE_URL, url);
+      localStorage.setItem(STORAGE_KEYS.SUPABASE_KEY, key);
+    } else {
+      localStorage.removeItem(STORAGE_KEYS.SUPABASE_URL);
+      localStorage.removeItem(STORAGE_KEYS.SUPABASE_KEY);
+    }
+    return await this.initClient();
+  }
+
   async initClient() {
-    const url = localStorage.getItem(STORAGE_KEYS.SUPABASE_URL);
-    const key = localStorage.getItem(STORAGE_KEYS.SUPABASE_KEY);
+    const creds = this.getCredentials();
+    const url = creds.url;
+    const key = creds.key;
 
     if (url && key && window.supabase) {
       try {
@@ -61,6 +88,7 @@ class SupabaseDataService {
         if (!error) {
           this.isConnected = true;
           console.log('✅ Connected to Supabase backend successfully.');
+          this.setupRealtimeSubscriptions();
           return { success: true, mode: 'cloud' };
         } else {
           console.warn('Supabase query failed, using local mode:', error.message);
@@ -78,27 +106,46 @@ class SupabaseDataService {
     return { success: true, mode: 'local' };
   }
 
-  async setCredentials(url, key) {
-    url = (url || '').trim();
-    key = (key || '').trim();
-    if (url && key) {
-      localStorage.setItem(STORAGE_KEYS.SUPABASE_URL, url);
-      localStorage.setItem(STORAGE_KEYS.SUPABASE_KEY, key);
-      return await this.initClient();
-    } else {
-      localStorage.removeItem(STORAGE_KEYS.SUPABASE_URL);
-      localStorage.removeItem(STORAGE_KEYS.SUPABASE_KEY);
-      this.client = null;
-      this.isConnected = false;
-      return { success: true, mode: 'local' };
+  setupRealtimeSubscriptions() {
+    if (!this.client || !this.isConnected) return;
+    if (this.realtimeChannel) {
+      try {
+        this.client.removeChannel(this.realtimeChannel);
+      } catch (e) {}
+    }
+
+    try {
+      this.realtimeChannel = this.client.channel('tsatsakpornu_realtime_changes')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'products' }, (payload) => {
+          console.log('⚡ Realtime Product update received from cloud:', payload);
+          this.notifyChange('products', payload);
+        })
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'sales' }, (payload) => {
+          console.log('⚡ Realtime Sales update received from cloud:', payload);
+          this.notifyChange('sales', payload);
+        })
+        .subscribe((status) => {
+          console.log('⚡ Supabase Realtime subscription status:', status);
+        });
+    } catch (e) {
+      console.warn('Could not setup realtime subscriptions:', e);
     }
   }
 
-  getCredentials() {
-    return {
-      url: localStorage.getItem(STORAGE_KEYS.SUPABASE_URL) || '',
-      key: localStorage.getItem(STORAGE_KEYS.SUPABASE_KEY) || ''
-    };
+  onDataChange(callback) {
+    if (typeof callback === 'function') {
+      this.changeListeners.push(callback);
+    }
+  }
+
+  notifyChange(entity, payload) {
+    for (const listener of this.changeListeners) {
+      try {
+        listener(entity, payload);
+      } catch (e) {
+        console.error('Data change listener error:', e);
+      }
+    }
   }
 
   /* ================= PRODUCTS CRUD ================= */
@@ -109,7 +156,7 @@ class SupabaseDataService {
           .from('products')
           .select('*')
           .order('name', { ascending: true });
-        if (!error && data && data.length > 0) {
+        if (!error && Array.isArray(data)) {
           this.localDB.products = data;
           this.saveLocalDB();
           return data;
@@ -130,7 +177,7 @@ class SupabaseDataService {
     product.stock = parseInt(product.stock) || 0;
     product.min_stock_alert = parseInt(product.min_stock_alert) || 5;
 
-    // Check existing
+    // Save locally
     const idx = this.localDB.products.findIndex(p => p.id === product.id);
     if (idx >= 0) {
       this.localDB.products[idx] = { ...this.localDB.products[idx], ...product };
@@ -139,12 +186,17 @@ class SupabaseDataService {
     }
     this.saveLocalDB();
 
+    // Sync to Supabase Cloud
     if (this.isConnected && this.client) {
       try {
         const { error } = await this.client
           .from('products')
           .upsert(product);
-        if (error) console.error('Cloud upsert product error:', error);
+        if (error) {
+          console.error('Cloud upsert product error:', error);
+        } else {
+          this.notifyChange('products', { event: 'upsert', product });
+        }
       } catch (e) {
         console.error('Error syncing product to cloud:', e);
       }
@@ -159,7 +211,10 @@ class SupabaseDataService {
 
     if (this.isConnected && this.client) {
       try {
-        await this.client.from('products').delete().eq('id', productId);
+        const { error } = await this.client.from('products').delete().eq('id', productId);
+        if (!error) {
+          this.notifyChange('products', { event: 'delete', productId });
+        }
       } catch (e) {
         console.error('Error deleting product from cloud:', e);
       }
@@ -244,6 +299,7 @@ class SupabaseDataService {
         // Delete products
         await this.client.from('products').delete().neq('id', '00000000-0000-0000-0000-000000000000');
         console.log('✅ Supabase cloud data cleared successfully.');
+        this.notifyChange('reset', {});
       } catch (e) {
         console.error('Error clearing cloud data:', e);
       }
@@ -264,7 +320,7 @@ class SupabaseDataService {
           `)
           .order('created_at', { ascending: false });
 
-        if (!error && data && data.length > 0) {
+        if (!error && Array.isArray(data)) {
           // Normalize items
           const normalized = data.map(s => ({
             ...s,
@@ -299,7 +355,7 @@ class SupabaseDataService {
       items: saleData.items || []
     };
 
-    // Save locally
+    // Save locally & deduct stock
     this.localDB.sales.unshift(sale);
     await this.deductStock(sale.items);
     this.saveLocalDB();
@@ -336,6 +392,7 @@ class SupabaseDataService {
             subtotal_profit: it.subtotal_profit
           }));
           await this.client.from('sale_items').insert(itemsPayload);
+          this.notifyChange('sales', { event: 'insert', sale });
         }
       } catch (e) {
         console.error('Error inserting sale to cloud:', e);

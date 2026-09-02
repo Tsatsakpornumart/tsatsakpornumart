@@ -47,6 +47,12 @@
       </div>
 
       <div class="header-actions">
+        <!-- Cloud Status Badge -->
+        <div class="user-badge" id="cloudStatusChip" onclick="window.app.openCloudConfigModal()" style="cursor: pointer;" title="Click to configure cross-device Supabase Cloud Sync">
+          <span class="status-dot offline" id="cloudStatusDot"></span>
+          <span id="cloudStatusText" style="font-size: 12px; font-weight: 600;">Cloud Status</span>
+        </div>
+
         <!-- User Profile Badge -->
         <div class="user-badge" id="headerUserBadge">
           <div class="user-avatar" id="headerUserAvatar">A</div>
@@ -397,6 +403,7 @@
   <div class="toast-container" id="toastContainer"></div>
 
   <!-- App Scripts -->
+  <script src="js/config.js"></script>
   <script src="js/supabase-client.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/pos.js"></script>
